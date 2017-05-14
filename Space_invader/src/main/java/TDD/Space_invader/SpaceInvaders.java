@@ -1,7 +1,12 @@
 package TDD.Space_invader;
 
+import utils.HorsEspaceJeuException;
+
 public class SpaceInvaders {
 
+	private static final char MARQUE_FIN_LIGNE = '\n';
+	private static final char MARQUE_VIDE = '.';
+	private static final char MARQUE_VAISSEAU = 'V';
 	private int largeur;
 	private int hauteur;
 	Vaisseau vaisseau;
@@ -13,17 +18,36 @@ public class SpaceInvaders {
 	
 	@Override
 	public String toString() {
+		return recupererEspaceDeJeuDansChaineASCII();
+	}
+
+	public String recupererEspaceDeJeuDansChaineASCII() {
 		StringBuilder espaceDeJeu = new StringBuilder();
 		for (int y = 0; y < hauteur; y++) {
 			for (int x = 0; x < largeur; x++) {
-				if (aUnVaisseauQuiOccupeLaPosition(y, x))
-					espaceDeJeu.append('V');
-				else
-					espaceDeJeu.append('.');
+				espaceDeJeu.append(recupererMarqueDeLaPosition(x, y));
 			}
-			espaceDeJeu.append('\n');
+			espaceDeJeu.append(MARQUE_FIN_LIGNE);
 		}
 		return espaceDeJeu.toString();
+	}
+
+	public void deplacerVaisseauVersLaDroite() {
+        if (vaisseau.abscisse()< (largeur-1)) vaisseau.seDeplacerVersLaDroite();
+	}
+
+	public void deplacerVaisseauVersLaGauche() {
+		if (vaisseau.abscisse()< 1) vaisseau.seDeplacerVersLaGauche();
+		
+	}
+	
+	private char recupererMarqueDeLaPosition(int x, int y) {
+		char marque;
+		if (aUnVaisseauQuiOccupeLaPosition(x, y))
+			marque = MARQUE_VAISSEAU;
+		else
+			marque = MARQUE_VIDE;
+		return marque;
 	}
 
 	private boolean aUnVaisseauQuiOccupeLaPosition(int y, int x) {
@@ -37,6 +61,16 @@ public class SpaceInvaders {
 	
 
 	public void positionnerUnNouveauVaisseau(int x, int y) {
-        this.vaisseau = new Vaisseau (x,y);
+		
+		if (  !estDansEspaceJeu(x, y) )
+			throw new HorsEspaceJeuException("La position du vaisseau est en dehors de l'espace jeu");
+	
+		vaisseau = new Vaisseau(x, y); 
 	}
+
+	private boolean estDansEspaceJeu(int x, int y) {
+		return ((x >= 0) && (x < largeur)) && ((y >= 0) && (y < hauteur));
+	}
+	
+	
 }
